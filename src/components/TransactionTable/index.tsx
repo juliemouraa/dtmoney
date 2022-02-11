@@ -1,41 +1,47 @@
-import { useEffect } from 'react'
-import { api } from '../../services/api';
-import { Container } from './styles'
-export function TransactionTable(){
-   
-    useEffect(() => {
-        // esse api.get substitui o fetch
-        api.get('transactions')
-            .then(response => console.log(response.data));
-    }, []);
+import { useContext } from "react";
+import { TransactionsContext } from "../../TransactionsContext";
+import { Container } from "./styles";
 
-    return(
-        <Container>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Título</th>
-                        <th>Valor</th>
-                        <th>Categoria</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
+export function TransactionTable() {
+  const { transactions }  = useContext(TransactionsContext);
 
-                <tbody>
-                    <tr>
-                        <td>Desenvolvimento de website</td>
-                        <td className="deposit">R$ 12,000</td>
-                        <td>Desenvolvimento</td>
-                        <td>20/02/2021</td>
-                    </tr>
-                    <tr>
-                        <td>Aluguel</td>
-                        <td className="withdraw">- R$ 1,100</td>
-                        <td>Casa</td>
-                        <td>17/02/2021</td>
-                    </tr>
-                </tbody>
-            </table>
-        </Container>
-   )
+  return (
+    <Container>
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Valor</th>
+            <th>Categoria</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {/**criando esse map para mostrar a transação em tela */}
+          {transactions.map((transaction) => (
+            <tr key={transaction.id}>
+              <td>{transaction.title}</td>
+              <td className={transaction.type}>
+                {/**para resolver a questão do tipo de moeda do local*/}
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency" /**para dar o style de valor de moeda*/,
+                  currency: "BRL" /**o tipo de moeda*/,
+                }).format(transaction.amount)}
+              </td>
+              <td>{transaction.category}</td>
+              <td>
+                {/**para resolver a questão da datal*/}
+                {new Intl.DateTimeFormat("pt-BR").format(
+                  new Date(
+                    transaction.createdAt
+                  ) /**convertendo string para date */
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Container>
+  );
 }

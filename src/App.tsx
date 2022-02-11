@@ -4,10 +4,12 @@ import { Header } from "./components/Header";
 import Modal from 'react-modal'
 import { Dashboard } from "./components/Dashboard";
 import { NewTransactionModal } from "./components/NewTransactionModal";
+import { TransactionsProvider } from './TransactionsContext'
 
 Modal.setAppElement('#root');
 
 export function App() {
+
   // criando o state do modal de nova transacao. ele comeca com false pq por padrao um modal comeca fechado
   const [ isNewTransactionModalOpen, setIsNewTransactionModalOpen ] = useState(false);
 
@@ -23,7 +25,7 @@ export function App() {
       // passo para o state um false, pois aqui ele vai fechar o modal.
   }
   return (
-    <>
+    <TransactionsProvider>
       <Header onOpenNewTransactionModal={handleOpenNewTransactionModal} />
       <Dashboard />
 
@@ -33,7 +35,7 @@ export function App() {
         onRequestClose={handleCloseNewTransactionModal}
       />
       <GlobalStyle />
-    </>
+    </TransactionsProvider>
   );
 }
 

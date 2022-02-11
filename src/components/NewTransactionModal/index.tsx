@@ -1,9 +1,13 @@
-import Modal from "react-modal";
 import incomeImg from "../../assets/income.svg";
 import outcomeImg from "../../assets/outcome.svg";
 import closeImg from "../../assets/close.svg";
+
 import { Container, TransactionTypeContainer, RadioBox } from "./styles";
-import { useState, FormEvent } from "react";
+
+import Modal from "react-modal";
+
+import { useState, FormEvent, useContext } from "react";
+import { TransactionsContext } from "../../TransactionsContext";
 import { api } from "../../services/api";
 
 interface NewTransactionModalProps {
@@ -12,9 +16,11 @@ interface NewTransactionModalProps {
 }
 
 export function NewTransactionModal({ isOpen, onRequestClose }: NewTransactionModalProps) {
+  const { createTransaction } = useContext(TransactionsContext);
+
   /**criamos cada estado para armazenar cada uma das informacoes que queremos salvar da nova transacao */
   const [title, setTitle] = useState(" ");
-  const [value, setValue] = useState(0);
+  const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState(" ");
   
   /**state para armazenar o botão que o usuário clicou */
@@ -22,18 +28,22 @@ export function NewTransactionModal({ isOpen, onRequestClose }: NewTransactionMo
   /**começamos com deposit, pois é o tipo que defini la do index.tsx  */
 
   /**handle para criar uma nova transacao e salvar os dados da mesma */
-  /***/
-  function handleCreateNewTransaction(e: FormEvent){
+  async function handleCreateNewTransaction(e: FormEvent){
     e.preventDefault();
 
-    /**criando uma const data para salvar os dados do formulario */
-    const data = {
+    // precisamos aguardar que a transaction seja concluida
+    await createTransaction({
       title,
-      value, 
+      amount,
       category,
-      type
-    };
+      type,
+    })
 
+    setTitle(''); //estamos limpando os campos, pq quando ele enviar os dados, e clicar no modal novamente os campos virao vazios
+    setAmount(0);
+    setCategory('');
+    setType('deposit');
+    onRequestClose();
   }
 
   return (
@@ -68,8 +78,8 @@ export function NewTransactionModal({ isOpen, onRequestClose }: NewTransactionMo
         <input 
           type="number" 
           placeholder="Valor" 
-          value={value} /**para salvar no estado que criammos. */
-          onChange={event => setValue(Number(event.target.value))} /**para salvar no novo state setTitle, o valor que foi digitado no input */
+          value={amount} /**para salvar no estado que criammos. */
+          onChange={event => setAmount(Number(event.target.value))} /**para salvar no novo state setTitle, o valor que foi digitado no input */
                                                                   /**aqui utilizamos o Number para converter o valor para numérico */
         />
 
