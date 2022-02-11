@@ -17,7 +17,8 @@ createServer({
           createdAt: new Date()
         }
       ]
-    });
+    })
+
   }
 })
 
